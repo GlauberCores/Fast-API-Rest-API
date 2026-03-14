@@ -1,0 +1,3 @@
+from fastapi imoport FastAPI
+#para roda nosso codigo no terminal  uvicorn main:app --reoad
+
