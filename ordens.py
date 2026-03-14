@@ -9,3 +9,4 @@ async def pedidos():
     :return:
     """
     return {"msg":'você acessou a rota de pedidos'}
+assert

@@ -25,3 +25,4 @@ async def Login(email=str, senha=str,nome=str):
             session.add(novo_usuario)
             session.commit()
             return {"msg": "usuario cadastrado com sucesso"}
+        async

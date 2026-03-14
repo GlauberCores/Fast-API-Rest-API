@@ -14,3 +14,4 @@ app = FastAPI()
 #Delete -> deletar
 app.include_router(auth)
 app.include_router(orders)
+@app.get("/")
