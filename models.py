@@ -67,4 +67,4 @@ def __init__(self,quantidade,sabor,preco_unitario,pedido):
 # alembic revision --autogenerate -m "Migracao Inicial"
 
 #atulizar banco
-#alambic upgrade head
+#alambic upgrade head kd
