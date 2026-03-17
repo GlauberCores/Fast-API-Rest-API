@@ -7,8 +7,8 @@ class UsuarioSchema(BaseModel):# UsuarioSchema é um modelo de dados que represe
     nome: str
     email: str
     senha: str
-    ativo: Optional[bool] 
-    admin: Optional[bool] 
+    ativo: Optional[bool] = True
+    admin: Optional[bool] = False
 
     class Config:
       from_attributes = True # Permite a conversão de atributos do modelo 

@@ -1,0 +1,16 @@
+# ambiente
+.venv/
+
+# cache
+__pycache__/
+*.pyc
+
+# banco
+*.db
+
+# variáveis
+.env
+
+# IDE
+.vscode/
+.idea/

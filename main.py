@@ -2,11 +2,9 @@ from fastapi import FastAPI
 from autenticacao import auth
 from ordens import orders
 from dotenv import load_dotenv
-import os
+
 
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
-
 #para roda nosso codigo no terminal  uvicorn main:app --reload
 app = FastAPI()
 
