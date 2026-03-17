@@ -16,3 +16,6 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 uvicorn main:app --reload
+## 📸 Preview da API
+
+![Swagger](C:\Users\choco\Desktop\png.png)
