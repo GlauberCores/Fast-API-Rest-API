@@ -1,4 +1,5 @@
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from dependencias import pegar_sessao,verificar_token
 from sqlalchemy.orm import Session
 from models import Usuario
@@ -18,7 +19,7 @@ auth = APIRouter(prefix="/auth", tags=["auth"])
    # data_expiracao -> Payload
 def criar_token(id_usuario,duracao = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
     data_expiracao = datetime.now(timezone.utc) + duracao
-    dic_info={"sub": id_usuario, "exp": data_expiracao}
+    dic_info={"sub": str(id_usuario), "exp": data_expiracao}
     jwt_codificado = jwt.encode(dic_info, SECRET_KEY, algorithm=ALGORITHM)
     return jwt_codificado
 
@@ -87,4 +88,18 @@ async def Refresh(usuario: Usuario = Depends(verificar_token)):
         "acess_token": acess_token,
         "token_type": "Bearer"
         
+    }
+
+@auth.post("/Login_form")
+async def Login_from(dados_fomulario: OAuth2PasswordRequestForm = Depends(), session: Session=Depends(pegar_sessao)):
+    usuario = autenticar_usuario(dados_fomulario.username, dados_fomulario.password, session)
+
+    if not usuario:
+        raise HTTPException(status_code=400, detail="Email ou senha incorretos")
+    else:
+        acess_token = criar_token(usuario.id)
+       
+    return {
+        "acess_token": acess_token,
+        "token_type": "Bearer"
     }
