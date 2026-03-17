@@ -6,6 +6,7 @@ from jose import jwt, JWTError
 from fastapi import Depends, HTTPException
 import os
 
+
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -20,6 +21,20 @@ def pegar_sessao():
     finally:
         session.close()
 
-def verificar_token(token: str, session: Session=Depends(pegar_sessao)):   
-    usuario = session.query(Usuario).filter(Usuario.id == 1).first()
+def verificar_token(token, session: Session = Depends(pegar_sessao)):
+    try:
+        dic_info = jwt.decode(token, SECRET_KEY, ALGORITHM)
+        id_usuario = dic_info.get("sub")
+
+        if not id_usuario:
+            raise HTTPException(status_code=401, detail="Token inválido")
+
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    usuario = session.query(Usuario).filter(Usuario.id == id_usuario).first()
+
+    if not usuario:
+        raise HTTPException(status_code=401, detail="Acesso negado")
+
     return usuario
