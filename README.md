@@ -1,22 +1,18 @@
-# FastAPI REST API - Orders System
-
-Projeto de API REST desenvolvido com FastAPI para gerenciamento de usuários e pedidos.
-
-## Tecnologias utilizadas
-
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite
-- Uvicorn
-
-## Funcionalidades
-
+## ⚙️ Funcionalidades
 - Cadastro de usuários
-- Autenticação básica
+- Autenticação
 - Criação de pedidos
-- Listagem de pedidos
-- Atualização de status de pedidos
+- Estrutura modular com rotas separadas
 
-## Estrutura do Projeto
+## ▶️ Como rodar o projeto
 
+```bash
+git clone https://github.com/SEU_USUARIO/SEU_REPO.git
+cd SEU_REPO
+
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+pip install -r requirements.txt
+
+uvicorn main:app --reload
