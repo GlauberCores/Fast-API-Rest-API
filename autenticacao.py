@@ -80,4 +80,5 @@ async def Refresh(usuario: Usuario = Depends(verificar_token)):
     return {
         "acess_token": acess_token,
         "token_type": "Bearer"
+        
     }
