@@ -22,7 +22,13 @@ def criar_token(id_usuario,duracao = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUT
     jwt_codificado = jwt.encode(dic_info, SECRET_KEY, algorithm=ALGORITHM)
     return jwt_codificado
 
-
+def autenticar_usuario(email, senha, session):
+    usuario = session.query(Usuario).filter(Usuario.email == email).first()
+    if not usuario:
+        return False
+    if not bcrypt_context.verify(senha, usuario.senha):
+        return False
+    return usuario
 
 @auth.get("/")
 async def Home():
@@ -61,14 +67,14 @@ async def Cadastrar(usuario_schema: UsuarioSchema, session=Depends(pegar_sessao)
 
 #login -> email e senha -> JWT (Json Web Token)
 @auth.post("/Login")
-async def Login(loginSchema: LoginSchema, session=Depends(pegar_sessao)):
-    usuario = verificar_token(loginSchema.email, loginSchema.senha, session)
+async def Login(loginSchema: LoginSchema, session: Session=Depends(pegar_sessao)):
+    usuario = autenticar_usuario(loginSchema.email, loginSchema.senha, session)
 
     if not usuario:
         raise HTTPException(status_code=400, detail="Email ou senha incorretos")
-
-    acess_token = criar_token(usuario.id)
-    refresh_token = criar_token(usuario.id, duracao=timedelta(days=7))
+    else:
+        acess_token = criar_token(usuario.id)
+        refresh_token = criar_token(usuario.id, duracao=timedelta(days=7))
     return {
         "acess_token": acess_token,
         "refresh_token": refresh_token,
