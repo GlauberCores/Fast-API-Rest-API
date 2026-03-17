@@ -1,6 +1,9 @@
-from fastapi import APIRouter
-from sqlalchemy.orm import sessionmaker
-from models import *
+from fastapi import APIRouter,Depends,HTTPException
+from dependencias import pegar_sessao
+from sqlalchemy.orm import Session
+from models import Usuario
+from security import bcrypt_context
+from schemas import UsuarioSchema
 
 auth = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -10,19 +13,25 @@ async def Home():
     Essa é a rota padrão de login
     :return:
     """
-    return {'mensagem':'você acessou a rota padrão de autenticação'}
-@auth.post("/login")
-async def Login(email=str, senha=str,nome=str):
-        Session = sessionmaker(bind=db)
-        session = Session()
-        usuario = session.query(Usuario).filter(Usuario.email == email).first()
-        if usuario:
-            # ja existe um usuario com o esse email
+    return {'mensagem':'você acessou a rota padrão de autenticação',"autenticação": False}
 
-            return {"msg": "já existe um usuário cadastrado com esse email"}
-        else:
-            novo_usuario = Usuario(email=email, senha=senha)
-            session.add(novo_usuario)
-            session.commit()
-            return {"msg": "usuario cadastrado com sucesso"}
-        session.close()
+@auth.post("/Cadastrar") 
+async def Cadastrar(usuario_schema: UsuarioSchema, session=Depends(pegar_sessao)):
+    usuario = session.query(Usuario).filter(Usuario.email == usuario_schema.email).first()
+    if usuario:
+        raise HTTPException(status_code=400, detail="Email já cadastrado")
+    
+    else:
+        senha_criptografada = bcrypt_context.hash(usuario_schema.senha)
+        novo_usuario = Usuario(
+        nome=usuario_schema.nome,
+        email=usuario_schema.email,
+        senha=senha_criptografada,
+        ativo=usuario_schema.ativo if usuario_schema.ativo is not None else True,
+        admin=usuario_schema.admin if usuario_schema.admin is not None else False
+    )
+
+        session.add(novo_usuario)
+        session.commit()
+
+        return {"msg": f"usuario cadastrado com sucesso {usuario_schema.email}"}

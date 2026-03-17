@@ -12,20 +12,20 @@ Base= declarative_base()
 class Usuario(Base):
  # Usuario
     __tablename__ = 'usuarios'
-
-    id    = Column('id', Integer, primary_key=True, autoincrement=True)#
-    nome  = Column('nome', String)
-    email = Column('email', String,nullable=False)
+ 
+    id    = Column('id',    Integer, primary_key=True, autoincrement=True)
+    nome  = Column('nome',  String)
+    email = Column('email', String, nullable=False, unique=True)
     senha = Column('senha', String)
     ativo = Column('ativo', Boolean)
-    admim = Column('admim', Boolean,default=False)
+    admin = Column('admin', Boolean, default=False)
 
-    def __init__(self, nome, email, senha, ativo=True, admim=False):
-        self.nome = nome
+    def __init__(self, nome, email, senha, ativo=True, admin=False):
+        self.nome  = nome
         self.email = email
         self.senha = senha
         self.ativo = ativo
-        self.admim = admim
+        self.admin = admin
 #Pedidos
 class Pedido(Base):
     __tablename__ = 'pedidos'
@@ -33,38 +33,40 @@ class Pedido(Base):
    # STATUS_PEDIDOS = (
    #     ('PENDENTE','PENDENTE'),
    #     ('CANCELADO','CANCELADO'),
-   #     ('FINALIZADO','FINALIZADO')
+   #    ('CONCLUIDO','CONCLUIDO')
    # )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     status = Column('status', String)# Pendente, Cancelado,
     usuario= Column('usuario', ForeignKey('usuarios.id'))
-    preco = Column('preco', Float)
+    preco  = Column('preco', Float)
 
 
-    def __init__(self,usuario,status='Pendente',preco=0):
+    def __init__(self, usuario, status='Pendente',preco=0):
         self.usuario = usuario
-        self.status = status
-        self.preco = preco
+        self.status  = status
+        self.preco   = preco
     #itens =
 
 #ItensPedido
 class ItensPedido(Base):
     __tablename__ = 'itens_pedido'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     quantidade = Column('quantidade', Integer)
     sabor = Column('sabor', String)
     preco_unitario = Column('preco', Float)
     pedido = Column('pedido', ForeignKey('pedidos.id'))
 
-def __init__(self,quantidade,sabor,preco_unitario,pedido):
+    def __init__(self, quantidade, sabor, preco_unitario, pedido):
         self.quantidade = quantidade
         self.sabor = sabor
         self.preco_unitario = preco_unitario
         self.pedido = pedido
 
+Base.metadata.create_all(bind=db)
 #executa a criação dos metadados do seu banco(cria o banco de dados)
 # alembic revision --autogenerate -m "Migracao Inicial"
 
 #atulizar banco
-#alambic upgrade head kd
+#alambic upgrade head 
