@@ -3,7 +3,7 @@ from dependencias import pegar_sessao
 from sqlalchemy.orm import Session
 from models import Usuario
 from security import bcrypt_context
-from schemas import UsuarioSchema
+from schemas import *
 
 auth = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -35,3 +35,16 @@ async def Cadastrar(usuario_schema: UsuarioSchema, session=Depends(pegar_sessao)
         session.commit()
 
         return {"msg": f"usuario cadastrado com sucesso {usuario_schema.email}"}
+
+
+#login -> email e senha -> JWT (Json Web Token)
+@auth.post("/Login")
+async def Login(loginSchema: LoginSchema, session=Depends(pegar_sessao)):
+    usuario = session.query(Usuario).filter(Usuario.email == loginSchema.email).first()
+    if not usuario:
+        raise HTTPException(status_code=400, detail="Email ou senha incorretos")
+    
+    if not bcrypt_context.verify(loginSchema.senha, usuario.senha):
+        raise HTTPException(status_code=400, detail="Email ou senha incorretos")
+    
+    return {"msg": f"Login bem-sucedido para {loginSchema.email}"}
