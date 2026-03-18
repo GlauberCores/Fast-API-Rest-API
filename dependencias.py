@@ -1,34 +1,38 @@
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from models import *
-from dotenv import load_dotenv
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException
-from security import SECRET_KEY, ALGORITHM, bcrypt_context,OAuth2PasswordBearer
-import os
+
+from models import db, Usuario
+from security import SECRET_KEY, ALGORITHM, oauth2_scheme
+
+# Sessão única por requisição
+SessionLocal = sessionmaker(bind=db, autoflush=False, autocommit=False)
 
 
 def pegar_sessao():
-    try:   
-        Session = sessionmaker(bind = db)
-        session = Session()
-        yield session           #yield é usado para criar um gerador, que é uma função que pode ser pausada e retomada, permitindo que o código seja executado de forma assíncrona e eficiente.
+    session = SessionLocal()
+    try:
+        yield session
     finally:
         session.close()
 
-def verificar_token(token:str=Depends(OAuth2PasswordBearer), session: Session = Depends(pegar_sessao)):
+
+def verificar_token(
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(pegar_sessao)
+):
+    """
+    Valida o JWT de acesso e retorna o usuário autenticado.
+    """
     try:
-        dic_info = jwt.decode(token, SECRET_KEY, ALGORITHM)
-        id_usuario = int(dic_info.get("sub"))
-
-        if not id_usuario:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        id_usuario = payload.get("sub")
+        if id_usuario is None:
             raise HTTPException(status_code=401, detail="Token inválido")
-
     except JWTError:
         raise HTTPException(status_code=401, detail="Token inválido")
 
-    usuario = session.query(Usuario).filter(Usuario.id == id_usuario).first()
-
+    usuario = session.query(Usuario).filter(Usuario.id == int(id_usuario)).first()
     if not usuario:
         raise HTTPException(status_code=401, detail="Acesso negado")
 

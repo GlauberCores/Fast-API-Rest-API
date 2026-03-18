@@ -1,20 +1,17 @@
-## ⚙️ Funcionalidades
+## Funcionalidades
 - Cadastro de usuários
-- Autenticação
+- Autenticação com JWT (access/refresh)
 - Criação de pedidos
 - Estrutura modular com rotas separadas
 
-## ▶️ Como rodar o projeto
-
+## Como rodar o projeto
 ```bash
-git clone https://github.com/SEU_USUARIO/SEU_REPO.git
-cd SEU_REPO
-
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 pip install -r requirements.txt
-
 uvicorn main:app --reload
-## 📸 Preview da API
+```
 
+## Preview da API
+Abra http://127.0.0.1:8000/docs para testar as rotas interativamente.
