@@ -16,8 +16,9 @@ class UsuarioSchema(BaseModel):# UsuarioSchema é um modelo de dados que represe
                              #   facilitando a integração entre os modelos de dados e os esquemas de validaçã
 
 class PedidoSchema(BaseModel):
-    usuario: int
-   
+    status: Optional[str] = "Pendente"
+    preco: Optional[float] = 0.0
+
     class Config:
         from_attributes = True
 
