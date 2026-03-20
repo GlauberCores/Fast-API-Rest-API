@@ -29,3 +29,12 @@ class LoginSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ItensPedidoSchema(BaseModel):
+    quantidade: int
+    sabor: str
+    preco_unitario: float
+    pedido: Optional[int] = None
+
+    class Config:
+        from_attributes = True

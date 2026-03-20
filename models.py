@@ -1,62 +1,59 @@
-from sqlalchemy import create_engine,Column,Integer,String,Boolean,Float,ForeignKey
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy_utils import ChoiceType
 
-#cria conexão com seu banco
-db= create_engine("sqlite:///database.db")
+# cria conexao com seu banco
+db = create_engine("sqlite:///database.db")
 
-#cria a base do banco de dados
-Base= declarative_base()
+# cria a base do banco de dados
+Base = declarative_base()
 
-#cria as classes/tabelas do banco
+
+# cria as classes/tabelas do banco
 class Usuario(Base):
- # Usuario
-    __tablename__ = 'usuarios'
- 
-    id    = Column('id',    Integer, primary_key=True, autoincrement=True)
-    nome  = Column('nome',  String)
-    email = Column('email', String, nullable=False, unique=True)
-    senha = Column('senha', String)
-    ativo = Column('ativo', Boolean)
-    admin = Column('admin', Boolean, default=False)
+    __tablename__ = "usuarios"
+
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    nome = Column("nome", String)
+    email = Column("email", String, nullable=False, unique=True)
+    senha = Column("senha", String)
+    ativo = Column("ativo", Boolean)
+    admin = Column("admin", Boolean, default=False)
 
     def __init__(self, nome, email, senha, ativo=True, admin=False):
-        self.nome  = nome
+        self.nome = nome
         self.email = email
         self.senha = senha
         self.ativo = ativo
         self.admin = admin
-#Pedidos
+
+
 class Pedido(Base):
-    __tablename__ = 'pedidos'
+    __tablename__ = "pedidos"
 
-   # STATUS_PEDIDOS = (
-   #     ('PENDENTE','PENDENTE'),
-   #     ('CANCELADO','CANCELADO'),
-   #    ('CONCLUIDO','CONCLUIDO')
-   # )
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    status = Column("status", String)  # Pendente, Cancelado, etc
+    usuario = Column("usuario", ForeignKey("usuarios.id"))
+    preco = Column("preco", Float, default=0.0)
+    itens = relationship("ItensPedido", cascade="all, delete", backref="pedido")
 
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-    status = Column('status', String)# Pendente, Cancelado,
-    usuario= Column('usuario', ForeignKey('usuarios.id'))
-    preco  = Column('preco', Float)
-
-
-    def __init__(self, usuario, status='Pendente',preco=0):
+    def __init__(self, usuario, status="Pendente", preco=0):
         self.usuario = usuario
-        self.status  = status
-        self.preco   = preco
-    #itens =
+        self.status = status
+        self.preco = preco
 
-#ItensPedido
+    def calcular_preco(self):
+        self.preco = sum(item.quantidade * item.preco_unitario for item in self.itens)
+
+
 class ItensPedido(Base):
-    __tablename__ = 'itens_pedido'
+    __tablename__ = "itens_pedido"
 
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-    quantidade = Column('quantidade', Integer)
-    sabor = Column('sabor', String)
-    preco_unitario = Column('preco', Float)
-    pedido = Column('pedido', ForeignKey('pedidos.id'))
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    quantidade = Column("quantidade", Integer)
+    sabor = Column("sabor", String)
+    preco_unitario = Column("preco", Float)
+    pedido = Column("pedido", ForeignKey("pedidos.id"))
 
     def __init__(self, quantidade, sabor, preco_unitario, pedido):
         self.quantidade = quantidade
@@ -64,9 +61,7 @@ class ItensPedido(Base):
         self.preco_unitario = preco_unitario
         self.pedido = pedido
 
-Base.metadata.create_all(bind=db)
-#executa a criação dos metadados do seu banco(cria o banco de dados)
-# alembic revision --autogenerate -m "Migracao Inicial"
 
-#atulizar banco
-#alambic upgrade head 
+Base.metadata.create_all(bind=db)
+# alembic revision --autogenerate -m "Migracao Inicial"
+# alembic upgrade head
